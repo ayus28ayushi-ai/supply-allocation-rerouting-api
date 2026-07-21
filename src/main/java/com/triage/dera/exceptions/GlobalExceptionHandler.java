@@ -2,6 +2,7 @@ package com.triage.dera.exceptions;
 
 import com.triage.dera.dto.ErrorResponseDto;
 import jakarta.persistence.OptimisticLockException;
+import org.springframework.dao.PessimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
@@ -49,6 +50,19 @@ public class GlobalExceptionHandler {
                 .build();
         return ResponseEntity.status(HttpStatus.CONFLICT).body(err);
     }
+
+    //warehouse not found
+    @ExceptionHandler(WarehouseNotFoundException.class)
+    public ResponseEntity<ErrorResponseDto> handleWarehouseNotFound(WarehouseNotFoundException ex){
+        ErrorResponseDto err = ErrorResponseDto.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.NOT_FOUND.value())
+                .error("NOT_FOUND")
+                .message("Warehouse not found.")
+                .build();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(err);
+    }
+
     //DTO validation failure
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponseDto> handleInvalidMethodArgument(MethodArgumentNotValidException ex){
@@ -68,9 +82,21 @@ public class GlobalExceptionHandler {
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.CONFLICT.value())
                 .error("CONCURRENCY_CONFLICT")
-                .message("Item claimed by another unit. Try Again!")
+                .message("Stock updated by another request. Please refresh and retry.")
                 .build();
         return ResponseEntity.status(HttpStatus.CONFLICT).body(err);
+    }
+
+    //handles pessimistic locking failure exceptions (eg. deadlocks)
+    @ExceptionHandler(PessimisticLockingFailureException.class)
+    public ResponseEntity<ErrorResponseDto> handlePessimisticLockingFailureException(PessimisticLockingFailureException ex){
+        ErrorResponseDto err = ErrorResponseDto.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.TOO_MANY_REQUESTS.value())
+                .error("HIGH_TRAFFIC")
+                .message("System is experiencing high load on this warehouse stock. Try again in a few seconds.")
+                .build();
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(err);
     }
 
     //General system error

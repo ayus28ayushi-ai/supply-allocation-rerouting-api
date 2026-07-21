@@ -1,9 +1,6 @@
 package com.triage.dera.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,7 +19,7 @@ public class AllocationRequestDto {
     @NotBlank(message = "Requester name must not be blank/empty/null.")
     private String requesterName;
     @NotNull(message = "Quantity requested should be a positive number")
-    @Positive
+    @Min(1)
     private Integer quantityRequested;
 
 }
