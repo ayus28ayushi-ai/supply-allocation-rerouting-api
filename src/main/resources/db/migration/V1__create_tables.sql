@@ -34,5 +34,7 @@ CREATE TABLE allocation_records (
                                     is_rerouted BOOLEAN NOT NULL,
                                     distance_km DOUBLE PRECISION NOT NULL,
                                     timestamp TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+                                    is_active BOOLEAN NOT NULL,
+                                    cancelled_by VARCHAR(200),
                                     CONSTRAINT fk_item_transaction FOREIGN KEY (item_id) REFERENCES inventory_items(id)
 );
