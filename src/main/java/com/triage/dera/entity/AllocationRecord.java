@@ -20,7 +20,10 @@ public class AllocationRecord {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id", nullable = false)
-    private InventoryItem item;
+    private InventoryItem itemId;
+
+    @Column(name = "item_name", nullable = false)
+    private String itemName;
 
     @Column(nullable = false)
     private String requesterName;
@@ -34,5 +37,19 @@ public class AllocationRecord {
     protected void onCreate(){
         this.timestamp = LocalDateTime.now();
     }
+
+    @Column(name = "requested_war_id", nullable = false)
+    private Long requestedWarId;
+    @Column(nullable = false)
+    private String requestedWarName;
+    @Column(name = "fulfilled_war_id", nullable = false)
+    private Long fulfilledWarId;
+
+    @Column(nullable = false)
+    private String fulfilledWarName;
+    @Column(name = "is_Rerouted", nullable = false)
+    private Boolean isRerouted;
+    @Column(name = "distance_km")
+    private Double distanceKm;
 
 }

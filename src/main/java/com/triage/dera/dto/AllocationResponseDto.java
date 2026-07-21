@@ -1,5 +1,7 @@
 package com.triage.dera.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -15,5 +17,11 @@ public class AllocationResponseDto {
     private Integer quantityRequested;
     private String status;
     private LocalDateTime timestamp;
+    private String reqWarehouseName;
+    private String fulfilledWarehouseName;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Double distanceKm;
+
 
 }

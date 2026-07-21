@@ -24,8 +24,15 @@ CREATE INDEX idx_warehouse_item ON inventory_items(item_name, warehouse_id);
 CREATE TABLE allocation_records (
                                     id BIGSERIAL PRIMARY KEY,
                                     item_id BIGINT NOT NULL,
+                                    item_name VARCHAR NOT NULL,
                                     requester_name VARCHAR(200) NOT NULL,
                                     quantity_claimed INT NOT NULL,
+                                    requested_war_id BIGINT NOT NULL,
+                                    requested_war_name VARCHAR(200) NOT NULL,
+                                    fulfilled_war_id BIGINT NOT NULL,
+                                    fulfilled_war_name VARCHAR(200) NOT NULL,
+                                    is_rerouted BOOLEAN NOT NULL,
+                                    distance_km DOUBLE PRECISION NOT NULL,
                                     timestamp TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
                                     CONSTRAINT fk_item_transaction FOREIGN KEY (item_id) REFERENCES inventory_items(id)
 );

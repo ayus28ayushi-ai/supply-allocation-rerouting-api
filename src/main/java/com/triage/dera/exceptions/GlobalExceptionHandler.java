@@ -38,6 +38,17 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(err);
     }
 
+    //Global Stock Shortage
+    @ExceptionHandler(GlobalStockShortageException.class)
+    public ResponseEntity<ErrorResponseDto> handleGlobalStockShortage(GlobalStockShortageException ex){
+        ErrorResponseDto err = ErrorResponseDto.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.CONFLICT.value())
+                .error("CONFLICT")
+                .message("Global stock shortage. Try again later.")
+                .build();
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(err);
+    }
     //DTO validation failure
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponseDto> handleInvalidMethodArgument(MethodArgumentNotValidException ex){

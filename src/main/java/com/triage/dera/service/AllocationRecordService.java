@@ -2,16 +2,22 @@ package com.triage.dera.service;
 
 import com.triage.dera.dto.AllocationRequestDto;
 import com.triage.dera.dto.AllocationResponseDto;
-import com.triage.dera.exceptions.InsufficientStockException;
-import com.triage.dera.exceptions.ResourceNotFoundException;
+import com.triage.dera.entity.Warehouse;
+import com.triage.dera.exceptions.GlobalStockShortageException;
 import com.triage.dera.mappers.Mappers;
 import com.triage.dera.entity.AllocationRecord;
 import com.triage.dera.entity.InventoryItem;
 import com.triage.dera.repository.AllocationRecordRepository;
 import com.triage.dera.repository.InventoryItemRepository;
+import com.triage.dera.utility.HaversineMathUtility;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Optional;
+
+import static java.lang.Math.min;
 
 @Service
 @AllArgsConstructor
@@ -23,25 +29,76 @@ public class AllocationRecordService {
 
     @Transactional
     public AllocationResponseDto createAllocation (AllocationRequestDto allocationRequestDto){
-        InventoryItem item = inventoryItemRepository
-                .findByItemNameAndWarehouseWarehouseId(
-                        allocationRequestDto.getItemName(), allocationRequestDto.getWarehouseId()
-                ).orElseThrow(() -> new ResourceNotFoundException(
-                        "Item "+ allocationRequestDto.getItemName() + "not available at "+ allocationRequestDto.getWarehouseId()
-                ));
 
-        //checking for stock availability
-        if(item.getQuantityAvailable() < allocationRequestDto.getQuantityRequested()){
-            throw new InsufficientStockException("Item out of stock at this warehouse");
+        InventoryItem fulfilledInventory = null;
+        boolean isRerouted = false;
+        Double minDistanceKm = null;
+
+        Optional<InventoryItem> primInventory = inventoryItemRepository.findByItemNameAndWarehouseWarehouseId(
+                allocationRequestDto.getItemName(), allocationRequestDto.getReqWarehouseId());
+
+        //stock available at the requested warehouse
+        if(primInventory.isPresent() && primInventory.get().getQuantityAvailable() >= allocationRequestDto.getQuantityRequested()){
+            fulfilledInventory = primInventory.get();
+            isRerouted = false;
         }
-        //updating the stock quantity at the warehouse
-        item.setQuantityAvailable(item.getQuantityAvailable() - allocationRequestDto.getQuantityRequested());
-        inventoryItemRepository.save(item);
+        //rerouting to a different warehouse
+        else{
+            isRerouted = true;
+            List<InventoryItem> secInventoryList = inventoryItemRepository.
+                    findByItemNameAndQuantityAvailableGreaterThanEqualAndWarehouseWarehouseIdNot(
+                            allocationRequestDto.getItemName(),
+                            allocationRequestDto.getQuantityRequested(),
+                            allocationRequestDto.getReqWarehouseId()
+                    );
+
+            if(secInventoryList.isEmpty()){
+                throw new GlobalStockShortageException("Requested item is out of stock across all the warehouses");
+            }
+
+            fulfilledInventory = findBestRerouteInventory(
+                    primInventory.get().getWarehouse(),
+                    secInventoryList
+                    );
+        }
+        minDistanceKm = HaversineMathUtility.calcGeoDistance(
+                primInventory.get().getWarehouse().getLatitude(),
+                primInventory.get().getWarehouse().getLongitude(),
+                fulfilledInventory.getWarehouse().getLatitude(),
+                fulfilledInventory.getWarehouse().getLongitude()
+        );
+
+        //updating the stock
+        fulfilledInventory.setQuantityAvailable(
+                fulfilledInventory.getQuantityAvailable() - allocationRequestDto.getQuantityRequested()
+        );
+        inventoryItemRepository.save(fulfilledInventory);
 
         //mapping
-        AllocationRecord ar = mapper.mapDtoToEntity(allocationRequestDto, item);
+        AllocationRecord ar = mapper.mapDtoToEntity(allocationRequestDto, primInventory.get(), fulfilledInventory,isRerouted, minDistanceKm);
         AllocationRecord savedRecord = allocationRecordRepository.save(ar);
         return mapper.mapEntityToDto(savedRecord);
     }
 
+    public InventoryItem findBestRerouteInventory(Warehouse primWar, List<InventoryItem> secInventItems){
+        double minDist = Double.MAX_VALUE;
+        InventoryItem bestInvent = null;
+
+        for(InventoryItem item : secInventItems){
+            Double dist = HaversineMathUtility.calcGeoDistance(
+                    primWar.getLatitude(),
+                    primWar.getLatitude(), item.getWarehouse().getLatitude(),
+                    item.getWarehouse().getLongitude()
+            );
+            if(dist < minDist){
+                minDist = dist;
+                bestInvent = item;
+
+            }
+        }
+        return bestInvent;
+    }
+
 }
+
+
