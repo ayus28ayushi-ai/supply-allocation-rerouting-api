@@ -1,7 +1,10 @@
 package com.triage.dera.exceptions;
 
 import com.triage.dera.dto.ErrorResponseDto;
-import jakarta.persistence.OptimisticLockException;
+import com.triage.dera.exceptions.customexceptions.GlobalStockShortageException;
+import com.triage.dera.exceptions.customexceptions.InsufficientStockException;
+import com.triage.dera.exceptions.customexceptions.ResourceNotFoundException;
+import com.triage.dera.exceptions.customexceptions.WarehouseNotFoundException;
 import org.springframework.dao.PessimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -1,6 +1,4 @@
-package com.triage.dera.exceptions;
-
-import com.triage.dera.entity.Warehouse;
+package com.triage.dera.exceptions.customexceptions;
 
 public class WarehouseNotFoundException extends RuntimeException{
     public WarehouseNotFoundException(String message){

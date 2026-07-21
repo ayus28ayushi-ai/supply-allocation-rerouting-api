@@ -1,6 +1,5 @@
-package com.triage.dera.dto;
+package com.triage.dera.dto.allocationdto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 

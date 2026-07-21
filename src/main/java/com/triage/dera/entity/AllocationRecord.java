@@ -20,7 +20,7 @@ public class AllocationRecord {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id", nullable = false)
-    private InventoryItem itemId;
+    private InventoryItem item;
 
     @Column(name = "item_name", nullable = false)
     private String itemName;
@@ -51,5 +51,11 @@ public class AllocationRecord {
     private Boolean isRerouted;
     @Column(name = "distance_km")
     private Double distanceKm;
+
+    @Column(name = "is_active", nullable = false)
+    private Boolean isActive = true;
+
+    @Column(name = "cancelled_by")
+    private String cancelledBy;
 
 }

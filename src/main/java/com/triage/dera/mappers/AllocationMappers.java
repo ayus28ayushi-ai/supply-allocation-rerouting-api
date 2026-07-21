@@ -1,32 +1,30 @@
 package com.triage.dera.mappers;
 
-import com.triage.dera.dto.AllocationRequestDto;
-import com.triage.dera.dto.AllocationResponseDto;
+import com.triage.dera.dto.allocationdto.AllocationRequestDto;
+import com.triage.dera.dto.allocationdto.AllocationResponseDto;
 import com.triage.dera.entity.AllocationRecord;
 import com.triage.dera.entity.InventoryItem;
-import com.triage.dera.entity.Warehouse;
-import jakarta.persistence.criteria.CriteriaBuilder;
 import org.springframework.stereotype.Component;
 
 @Component
-public class Mappers {
+public class AllocationMappers {
 
-    public AllocationResponseDto mapEntityToDto(AllocationRecord allocResult){
+    public AllocationResponseDto mapEntityToDto(AllocationRecord allocRecord){
          AllocationResponseDto aRD = new AllocationResponseDto();
-         aRD.setAllocationId(allocResult.getAllocationId());
-         aRD.setItemName(allocResult.getItemId().getItemName());
-        aRD.setRequesterName(allocResult.getRequesterName());
-        aRD.setQuantityRequested(allocResult.getQuantityRequested());
-        if(Boolean.TRUE.equals(allocResult.getIsRerouted())){
-            aRD.setDistanceKm(allocResult.getDistanceKm());
+         aRD.setAllocationId(allocRecord.getAllocationId());
+         aRD.setItemName(allocRecord.getItem().getItemName());
+        aRD.setRequesterName(allocRecord.getRequesterName());
+        aRD.setQuantityRequested(allocRecord.getQuantityRequested());
+        if(Boolean.TRUE.equals(allocRecord.getIsRerouted())){
+            aRD.setDistanceKm(allocRecord.getDistanceKm());
             aRD.setStatus(" NEAREST WAREHOUSE REROUTING SUCCESSFUL!");
         }
         else{
             aRD.setStatus("SUCCESS!");
         }
-        aRD.setReqWarehouseName(allocResult.getRequestedWarName());
-        aRD.setFulfilledWarehouseName(allocResult.getFulfilledWarName());
-        aRD.setTimestamp(allocResult.getTimestamp());
+        aRD.setReqWarehouseName(allocRecord.getRequestedWarName());
+        aRD.setFulfilledWarehouseName(allocRecord.getFulfilledWarName());
+        aRD.setTimestamp(allocRecord.getTimestamp());
 
         return aRD;
     }
@@ -40,7 +38,7 @@ public class Mappers {
     {
          AllocationRecord allocRec = new AllocationRecord();
 
-         allocRec.setItemId(fulfilledItem);
+         allocRec.setItem(fulfilledItem);
         allocRec.setItemName(fulfilledItem.getItemName());
         allocRec.setRequestedWarName(primInvent.getWarehouse().getName());
         allocRec.setRequestedWarId(primInvent.getWarehouse().getWarehouseId());

@@ -1,4 +1,4 @@
-package com.triage.dera.dto;
+package com.triage.dera.dto.allocationdto;
 
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
