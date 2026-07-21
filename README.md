@@ -1,10 +1,10 @@
 # DERA (Dynamic Emergency Rerouting & Allocation System)
 
-🚧 **Status: Under Active Development** 🚧
+⚠️ **Status: Under Active Development** ⚠️
 
 ---
 
-### 📌 Current Implementation
+###  Current Implementation
 
 * **Database Architecture:** Schema management using PostgreSQL and Flyway migrations.
 * **Data Access & Mappings:** Spring Data JPA entities and custom stock lookup queries.
