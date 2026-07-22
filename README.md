@@ -1,11 +1,13 @@
 # DERA (Dynamic Emergency Rerouting & Allocation System)
 
-🚧 **Status: Under Active Development** 🚧
+⚠️ **Status: Under Active Development** ⚠️
 
 ---
 
-### 📌 Current Implementation
+###  Current Implementation
 
-- **Database Architecture:** Schema management and version control using PostgreSQL and Flyway migrations.
-- **Data Access & Mappings:** Spring Data JPA entity mappings with custom query methods for stock lookup.
-- **Fulfillment & Rerouting Engine:** Core allocation pipeline that processes incoming requests and automatically reroutes orders to alternative warehouses when primary stock is depleted.
+* **Database Architecture:** Schema management using PostgreSQL and Flyway migrations.
+* **Data Access & Mappings:** Spring Data JPA entities and custom stock lookup queries.
+* **Fulfillment & Rerouting Engine:** Core pipeline that auto-reroutes orders to alternative warehouses when primary stock is depleted.
+* **Concurrency Control:** Hybrid locking to prevent race conditions during concurrent stock updates.
+* **API & DTO Layer:** REST endpoints for allocations, cancellation with stock restoration, and dedicated DTOs for request validation.
