@@ -12,6 +12,6 @@
 * **Hybrid Concurrency Control:**
   * **Pessimistic Locks (`FOR UPDATE`):** Single-item row locks on order allocations and cancellation restocks to prevent double-allocations and lost updates.
   * **Optimistic Locks (`@Version`):** DTO version-matching on admin stock updates to prevent stale web form overwrites.
-* **API & DTO Layer:** 10 REST endpoints with request validation and centralized global exception handling
+* **API & DTO Layer:** 10 REST endpoints with request validation and centralized global exception handling (Tested using Postman)
 
   ...
