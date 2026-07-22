@@ -4,10 +4,14 @@
 
 ---
 
-###  Current Implementation
+* ### Current Implementation
 
-* **Database Architecture:** Schema management using PostgreSQL and Flyway migrations.
-* **Data Access & Mappings:** Spring Data JPA entities and custom stock lookup queries.
-* **Fulfillment & Rerouting Engine:** Core pipeline that auto-reroutes orders to alternative warehouses when primary stock is depleted.
-* **Concurrency Control:** Hybrid locking to prevent race conditions during concurrent stock updates.
-* **API & DTO Layer:** REST endpoints for allocations, cancellation with stock restoration, and dedicated DTOs for request validation.
+* **Database Architecture:** PostgreSQL with Flyway migration scripts and `@Version` schema columns.
+* **Data Access & Mapping:** Spring Data JPA method conventions with null-safe DTO mapping and custom stock lookup queries.
+* **  Rerouting Engine:** Proximity-sorted candidate evaluation via Haversine math with an automatic multi-warehouse fallback loop.
+* **Hybrid Concurrency Control:**
+  * **Pessimistic Locks (`FOR UPDATE`):** Single-item row locks on order allocations and cancellation restocks to prevent double-allocations and lost updates.
+  * **Optimistic Locks (`@Version`):** DTO version-matching on admin stock updates to prevent stale web form overwrites.
+* **API & DTO Layer:** 10 REST endpoints with request validation and centralized global exception handling
+
+  ...
