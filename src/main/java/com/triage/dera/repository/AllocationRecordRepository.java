@@ -12,4 +12,6 @@ import java.util.Optional;
 public interface AllocationRecordRepository extends JpaRepository<AllocationRecord, Long> {
 
     List<AllocationRecord> findByRequestedWarIdOrFulfilledWarId(Long requestedWarId, Long fulfilledWarId);
+
+    List<AllocationRecord> findByItem_ItemId(Long itemId);
 }

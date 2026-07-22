@@ -58,4 +58,8 @@ public class AllocationRecord {
     @Column(name = "cancelled_by")
     private String cancelledBy;
 
+    @Version
+    @Column(name = "version", nullable = false)
+    private Long version;
+
 }

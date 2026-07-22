@@ -10,7 +10,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class AllocationRequestDto {
+public class AllocationRequestUserDto {
 
     @NotBlank(message = "Item name must not be blank/empty/null.")
     private String itemName;

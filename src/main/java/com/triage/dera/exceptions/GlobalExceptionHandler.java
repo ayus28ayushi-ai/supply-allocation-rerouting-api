@@ -1,10 +1,7 @@
 package com.triage.dera.exceptions;
 
 import com.triage.dera.dto.ErrorResponseDto;
-import com.triage.dera.exceptions.customexceptions.GlobalStockShortageException;
-import com.triage.dera.exceptions.customexceptions.InsufficientStockException;
-import com.triage.dera.exceptions.customexceptions.ResourceNotFoundException;
-import com.triage.dera.exceptions.customexceptions.WarehouseNotFoundException;
+import com.triage.dera.exceptions.customexceptions.*;
 import org.springframework.dao.PessimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -64,6 +61,18 @@ public class GlobalExceptionHandler {
                 .message("Warehouse not found.")
                 .build();
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(err);
+    }
+
+    //Resource already present
+    @ExceptionHandler(ResourceAlreadyPresentException.class)
+    public ResponseEntity<ErrorResponseDto> handleResourceAlreadyPresentException(ResourceAlreadyPresentException ex){
+        ErrorResponseDto err = ErrorResponseDto.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.CONFLICT.value())
+                .error("CONFLICT")
+                .message(ex.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(err);
     }
 
     //DTO validation failure

@@ -22,4 +22,9 @@ public class Warehouse {
     private Double latitude;
     @Column(nullable = false)
     private Double longitude;
+    @Column(nullable = false)
+    private Boolean isActive;
+    @Version
+    @Column(nullable = false)
+    private Long version;
 }

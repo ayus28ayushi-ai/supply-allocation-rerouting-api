@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Getter
 @Setter
-public class AllocationResponseDto {
+public class AllocationResponseUserDto {
     private Long allocationId;
     private String itemName;
     private String requesterName;
