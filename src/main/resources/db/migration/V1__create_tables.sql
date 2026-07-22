@@ -1,13 +1,15 @@
 -- warehouses
-CREATE TABLE warehouses (
+CREATE TABLE IF NOT EXISTS warehouses (
                             id BIGSERIAL PRIMARY KEY,
                             name VARCHAR(200) NOT NULL,
                             latitude DOUBLE PRECISION NOT NULL,
-                            longitude DOUBLE PRECISION NOT NULL
+                            longitude DOUBLE PRECISION NOT NULL,
+                            is_active BOOLEAN NOT NULL DEFAULT TRUE,
+                            version BIGINT NOT NULL DEFAULT 0
 );
 
 -- inventory items
-CREATE TABLE inventory_items(
+CREATE TABLE IF NOT EXISTS inventory_items(
                                 id BIGSERIAL PRIMARY KEY,
                                 warehouse_id BIGINT NOT NULL,
                                 item_name VARCHAR(200) NOT NULL,
@@ -21,7 +23,7 @@ CREATE TABLE inventory_items(
 CREATE INDEX idx_warehouse_item ON inventory_items(item_name, warehouse_id);
 
 -- records for the allocated items
-CREATE TABLE allocation_records (
+CREATE TABLE IF NOT EXISTS allocation_records (
                                     id BIGSERIAL PRIMARY KEY,
                                     item_id BIGINT NOT NULL,
                                     item_name VARCHAR NOT NULL,
@@ -36,5 +38,6 @@ CREATE TABLE allocation_records (
                                     timestamp TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
                                     is_active BOOLEAN NOT NULL,
                                     cancelled_by VARCHAR(200),
+                                    version BIGINT NOT NULL DEFAULT 0,
                                     CONSTRAINT fk_item_transaction FOREIGN KEY (item_id) REFERENCES inventory_items(id)
 );
