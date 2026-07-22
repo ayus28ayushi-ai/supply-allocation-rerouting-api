@@ -15,10 +15,13 @@ public interface InventoryItemRepository extends JpaRepository<InventoryItem, Lo
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     Optional<InventoryItem> findByItemNameAndWarehouseWarehouseId(String itemName, Long reqWarehouseId);
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
+
     List<InventoryItem> findByItemNameAndQuantityAvailableGreaterThanEqualAndWarehouseWarehouseIdNot(
             String itemName,
             Integer quantityRequested,
             Long primWarehouseId
     );
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    Optional<InventoryItem> findByItemId(Long itemId);
 }

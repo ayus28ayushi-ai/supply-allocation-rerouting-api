@@ -1,9 +1,6 @@
 package com.triage.dera.service;
 
-import com.triage.dera.dto.allocationdto.AllocationCancelRequestDto;
-import com.triage.dera.dto.allocationdto.AllocationCancelResponseDto;
-import com.triage.dera.dto.allocationdto.AllocationRequestDto;
-import com.triage.dera.dto.allocationdto.AllocationResponseDto;
+import com.triage.dera.dto.allocationdto.*;
 import com.triage.dera.entity.Warehouse;
 import com.triage.dera.exceptions.customexceptions.GlobalStockShortageException;
 import com.triage.dera.exceptions.customexceptions.ResourceNotFoundException;
@@ -15,9 +12,8 @@ import com.triage.dera.repository.AllocationRecordRepository;
 import com.triage.dera.repository.InventoryItemRepository;
 import com.triage.dera.repository.WareHouseRepository;
 import com.triage.dera.utility.HaversineMathUtility;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,65 +30,97 @@ public class AllocationRecordService {
     private final WareHouseRepository warehouseRepository;
 
     @Transactional
-    public AllocationResponseDto createAllocation (AllocationRequestDto allocationRequestDto){
+    public AllocationResponseUserDto createAllocation (AllocationRequestUserDto allocationRequestUserDto) {
 
         InventoryItem fulfilledInventory = null;
         boolean isRerouted = false;
         Double minDistanceKm = null;
 
         Optional<InventoryItem> primInventory = inventoryItemRepository.findByItemNameAndWarehouseWarehouseId(
-                allocationRequestDto.getItemName(), allocationRequestDto.getReqWarehouseId());
+                allocationRequestUserDto.getItemName(), allocationRequestUserDto.getReqWarehouseId());
 
         //stock available at the requested warehouse
-        if(primInventory.isPresent() && primInventory.get().getQuantityAvailable() >= allocationRequestDto.getQuantityRequested()){
+        Warehouse primWar = null;
+        if (primInventory.isPresent() && primInventory.get().getQuantityAvailable() >= allocationRequestUserDto.getQuantityRequested()) {
             fulfilledInventory = primInventory.get();
             isRerouted = false;
+            primWar = fulfilledInventory.getWarehouse();
         }
         //rerouting to a different warehouse
-        else{
+        else {
             isRerouted = true;
             List<InventoryItem> secInventoryList = inventoryItemRepository.
                     findByItemNameAndQuantityAvailableGreaterThanEqualAndWarehouseWarehouseIdNot(
-                            allocationRequestDto.getItemName(),
-                            allocationRequestDto.getQuantityRequested(),
-                            allocationRequestDto.getReqWarehouseId()
+                            allocationRequestUserDto.getItemName(),
+                            allocationRequestUserDto.getQuantityRequested(),
+                            allocationRequestUserDto.getReqWarehouseId()
                     );
 
-            if(secInventoryList.isEmpty()){
+            if (secInventoryList.isEmpty()) {
                 throw new GlobalStockShortageException("Requested item is out of stock across all the warehouses");
             }
 
             //if the warehouse don't keep that item, reroute again
-            Warehouse primWar;
-            if(primInventory.isPresent()){
+            if (primInventory.isPresent()) {
                 primWar = primInventory.get().getWarehouse();
-            } else{
+            } else {
                 primWar = warehouseRepository
-                        .findById(allocationRequestDto
+                        .findById(allocationRequestUserDto
                                 .getReqWarehouseId())
                         .orElseThrow(() -> new WarehouseNotFoundException("Warehouse ID not found"));
 
             }
 
-            fulfilledInventory = findBestRerouteInventory(primWar, secInventoryList);
+            //sorting the potential rerouting candidates so we can keep rerouting if the closest one doesn't work out
+            Warehouse finalPrimWar = primWar;
+            secInventoryList.sort((i1, i2) -> {
+                double d1 = HaversineMathUtility.calcGeoDistance(
+                        finalPrimWar.getLatitude(), finalPrimWar.getLongitude(),
+                        i1.getWarehouse().getLatitude(), i1.getWarehouse().getLongitude());
+                double d2 = HaversineMathUtility.calcGeoDistance(
+                        finalPrimWar.getLatitude(), finalPrimWar.getLongitude(),
+                        i2.getWarehouse().getLatitude(), i2.getWarehouse().getLongitude());
+                return Double.compare(d1, d2);
+            });
+
+            // looping and applying the pessimistic lock on the closed candidate
+            for (InventoryItem candidate : secInventoryList) {
+                Optional<InventoryItem> lockedCandidate = inventoryItemRepository.findByItemId(candidate.getItemId());
+
+                if (lockedCandidate.isPresent() && lockedCandidate.get().getQuantityAvailable() >= allocationRequestUserDto.getQuantityRequested()) {
+                    fulfilledInventory = lockedCandidate.get();
+                    break;
+                }
+            }
+
+            if (fulfilledInventory == null) {
+                throw new GlobalStockShortageException("Stock was claimed by concurrent orders across all nearby warehouses.");
+            }
         }
+
         minDistanceKm = HaversineMathUtility.calcGeoDistance(
-                primInventory.get().getWarehouse().getLatitude(),
-                primInventory.get().getWarehouse().getLongitude(),
+                primWar.getLatitude(),
+                primWar.getLongitude(),
                 fulfilledInventory.getWarehouse().getLatitude(),
                 fulfilledInventory.getWarehouse().getLongitude()
         );
 
         //updating the stock
         fulfilledInventory.setQuantityAvailable(
-                fulfilledInventory.getQuantityAvailable() - allocationRequestDto.getQuantityRequested()
+                fulfilledInventory.getQuantityAvailable() - allocationRequestUserDto.getQuantityRequested()
         );
         inventoryItemRepository.save(fulfilledInventory);
 
         //mapping
-        AllocationRecord ar = mapper.mapDtoToEntity(allocationRequestDto, primInventory.get(), fulfilledInventory,isRerouted, minDistanceKm);
+        AllocationRecord ar = mapper.mapUserDtoToEntity(
+                allocationRequestUserDto,
+                primWar,
+                fulfilledInventory,
+                isRerouted,
+                minDistanceKm
+        );
         AllocationRecord savedRecord = allocationRecordRepository.save(ar);
-        return mapper.mapEntityToDto(savedRecord);
+        return mapper.mapEntityToUserDto(savedRecord);
     }
 
     public InventoryItem findBestRerouteInventory(Warehouse primWar, List<InventoryItem> secInventItems){
@@ -102,7 +130,7 @@ public class AllocationRecordService {
         for(InventoryItem item : secInventItems){
             Double dist = HaversineMathUtility.calcGeoDistance(
                     primWar.getLatitude(),
-                    primWar.getLatitude(), item.getWarehouse().getLatitude(),
+                    primWar.getLongitude(), item.getWarehouse().getLatitude(),
                     item.getWarehouse().getLongitude()
             );
             if(dist < minDist){
@@ -116,29 +144,35 @@ public class AllocationRecordService {
 
     //for viewing allocation record by id
     @Transactional(readOnly = true)
-    public AllocationResponseDto viewAllocation(Long allocationId) {
+    public AllocationResponseUserDto viewAllocation(Long allocationId) {
         AllocationRecord record = allocationRecordRepository.findById(allocationId)
                 .orElseThrow(() -> new ResourceNotFoundException("No allocation record with id: " + allocationId));
 
-        return mapper.mapEntityToDto(record);
+        return mapper.mapEntityToUserDto(record);
     }
 
     //for viewing all the allocations of a warehouse
     @Transactional(readOnly = true)
-    public List<AllocationResponseDto> viewAllAllocationForWarehouse(Long warId) {
+    public List<AllocationResponseAdminDto> viewAllAllocationForWarehouse(Long warId) {
        List<AllocationRecord> records = allocationRecordRepository.findByRequestedWarIdOrFulfilledWarId(warId, warId);
 
         if (records.isEmpty()) {
             throw new ResourceNotFoundException("No Allocation records found for the warehouse id: " + warId);
         }
 
-        return records.stream().map(mapper::mapEntityToDto).toList();
+        return records.stream().map(mapper::mapEntityToAdminDto).toList();
     }
 
     //for cancelling an allocation and restocking the canceled items
+    @Transactional
     public AllocationCancelResponseDto cancelAllocation(Long allocationId, AllocationCancelRequestDto request) {
         AllocationRecord record = allocationRecordRepository.findById(allocationId)
                 .orElseThrow(() -> new ResourceNotFoundException("No allocation record with id: "+ allocationId));
+
+        //optimistic locking
+        if (request.getVersion() != null && !request.getVersion().equals(record.getVersion())) {
+            throw new ObjectOptimisticLockingFailureException(AllocationRecord.class, allocationId);
+        }
 
         //checking current status
         if(!record.getIsActive()){
@@ -146,7 +180,9 @@ public class AllocationRecordService {
         }
 
         //restocking the inventory
-        InventoryItem item = record.getItem();
+        //pessimistic lock
+        InventoryItem item = inventoryItemRepository.findByItemId(record.getItem().getItemId())
+                .orElseThrow(() -> new ResourceNotFoundException("Item not found"));
         item.setQuantityAvailable(record.getQuantityRequested() + item.getQuantityAvailable());
         inventoryItemRepository.save(item);
 
@@ -169,6 +205,26 @@ public class AllocationRecordService {
                 .isActive(false)
                 .build();
 
+    }
+
+    @Transactional(readOnly = true)
+    public List<AllocationResponseAdminDto> viewAuditHistory() {
+        List<AllocationRecord> record = allocationRecordRepository.findAll();
+        if(record.isEmpty()){
+            throw new ResourceNotFoundException("No history found.");
+        }
+        return record.stream().map(mapper::mapEntityToAdminDto).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<AllocationResponseAdminDto> viewAllocationByItem(Long itemId) {
+        List<AllocationRecord> records = allocationRecordRepository.findByItem_ItemId(itemId);
+
+        if (records.isEmpty()) {
+            throw new ResourceNotFoundException("No Allocation records found for the item id: " + itemId);
+        }
+
+        return records.stream().map(mapper::mapEntityToAdminDto).toList();
     }
 }
 
