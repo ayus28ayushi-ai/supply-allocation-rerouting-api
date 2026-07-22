@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @Builder
-public class WarehouseRequestDto {
+public class WarehouseCreateRequestDto {
     @NotBlank(message = "Warehouse name can't be empty")
     private String name;
     @NotNull(message = "Latitude can't be null")
