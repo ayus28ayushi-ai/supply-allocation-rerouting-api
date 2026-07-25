@@ -41,3 +41,15 @@ CREATE TABLE IF NOT EXISTS allocation_records (
                                     version BIGINT NOT NULL DEFAULT 0,
                                     CONSTRAINT fk_item_transaction FOREIGN KEY (item_id) REFERENCES inventory_items(id)
 );
+
+CREATE TABLE IF NOT EXISTS inventory_restock (
+    id BIGSERIAL PRIMARY KEY,
+    item_id BIGINT,
+    item_name VARCHAR(200) NOT NULL,
+    warehouse_id BIGINT NOT NULL,
+    warehouse_name VARCHAR(200) NOT NULL,
+    last_quantity_added INT NOT NULL DEFAULT 0,
+    added_by VARCHAR(200) NOT NULL,
+    added_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_item_history FOREIGN KEY(item_id) REFERENCES inventory_items(id) ON DELETE SET NULL
+)
