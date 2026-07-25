@@ -15,5 +15,5 @@
 * **API & DTO Layer:** 10 REST endpoints with request validation and centralized global exception handling (Tested using Postman)
 * Implemented 10 more REST endpoints across User and Admin controllers for stock management and catalog operations.
 * Created new inventory tables and audit log schema in PostgreSQL.
-
+* Added pagination to allocation records and inventory item restock audit history
   ...
