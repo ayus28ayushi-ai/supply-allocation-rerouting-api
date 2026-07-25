@@ -2,6 +2,8 @@ package com.triage.dera.repository;
 
 import com.triage.dera.entity.InventoryItem;
 import com.triage.dera.entity.InventoryRestock;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

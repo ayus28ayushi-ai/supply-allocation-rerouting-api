@@ -56,7 +56,7 @@ public class AllocationRecordController {
     @GetMapping
     public ResponseEntity<Page<AllocationResponseAdminDto>> viewAuditHistory(
             @PageableDefault(
-                    page=0, size=6, sort="allocationId", direction = Sort.Direction.DESC
+                    page=0, size=6, sort="allocationId", direction = Sort.Direction.ASC
             ) Pageable pageable
     ){
         return ResponseEntity.status(HttpStatus.OK)

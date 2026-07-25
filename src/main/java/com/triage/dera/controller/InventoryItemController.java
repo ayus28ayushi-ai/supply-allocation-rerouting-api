@@ -4,6 +4,10 @@ import com.triage.dera.dto.inventoryitemdto.*;
 import com.triage.dera.service.InventoryItemService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +24,7 @@ public class InventoryItemController {
    //ENDPOINTS FOR THE USER
     //get all inventory item details
    @GetMapping
-   public ResponseEntity<List<InventoryItemResponseDto>> getAllInventoryForUser() {
+   public ResponseEntity<List<InventoryItemResponseDto>> getAllInventoryForUser(){
        return ResponseEntity.ok(inventoryItemService.getAllInventoryForUser());
    }
 
@@ -37,10 +41,14 @@ public class InventoryItemController {
     }
 
     //ENDPOINTS FOR THE ADMIN
-    //get the latest log of  inventory item
+    //get the latest log of  inventory item (audit history)
     @GetMapping("/admin")
-    public ResponseEntity<List<InventoryItemResponseAdminDto>> getAllInventoryForAdmin() {
-        return ResponseEntity.ok(inventoryItemService.getAllInventoryForAdmin());
+    public ResponseEntity<Page<InventoryItemResponseAdminDto>> getAllInventoryForAdmin(
+            @PageableDefault(
+                    page=0, size=6, sort="itemId", direction = Sort.Direction.ASC
+            ) Pageable pageable
+    ) {
+        return ResponseEntity.ok(inventoryItemService.getAllInventoryForAdmin(pageable));
     }
 
     //get all inventory item details by warehouse id

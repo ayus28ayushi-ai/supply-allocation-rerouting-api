@@ -11,6 +11,8 @@ import com.triage.dera.repository.InventoryRestockRepository;
 import com.triage.dera.repository.WarehouseRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,16 +59,14 @@ public class InventoryItemService {
     }
 
     @Transactional(readOnly = true)
-    public List<InventoryItemResponseAdminDto> getAllInventoryForAdmin() {
-        return inventoryItemRepository.findAll()
-                .stream()
+    public Page<InventoryItemResponseAdminDto> getAllInventoryForAdmin(Pageable pageable) {
+        return inventoryItemRepository.findAll(pageable)
                 .map(item -> {
                     InventoryRestock latestLog = inventoryRestockRepository
                             .findTopByItemId_ItemIdOrderByIdDesc(item.getItemId())
                             .orElse(null);
                     return mappers.toAdminResponseDto(item, latestLog);
-                })
-                .toList();
+                });
     }
 
     @Transactional(readOnly = true)
