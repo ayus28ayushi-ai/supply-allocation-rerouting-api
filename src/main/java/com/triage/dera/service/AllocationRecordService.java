@@ -10,7 +10,7 @@ import com.triage.dera.entity.AllocationRecord;
 import com.triage.dera.entity.InventoryItem;
 import com.triage.dera.repository.AllocationRecordRepository;
 import com.triage.dera.repository.InventoryItemRepository;
-import com.triage.dera.repository.WareHouseRepository;
+import com.triage.dera.repository.WarehouseRepository;
 import com.triage.dera.utility.HaversineMathUtility;
 import lombok.RequiredArgsConstructor;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
@@ -27,7 +27,7 @@ public class AllocationRecordService {
     private final AllocationRecordRepository allocationRecordRepository;
     private final InventoryItemRepository inventoryItemRepository;
     private final AllocationMappers mapper;
-    private final WareHouseRepository warehouseRepository;
+    private final WarehouseRepository warehouseRepository;
 
     @Transactional
     public AllocationResponseUserDto createAllocation (AllocationRequestUserDto allocationRequestUserDto) {
@@ -85,7 +85,7 @@ public class AllocationRecordService {
 
             // looping and applying the pessimistic lock on the closed candidate
             for (InventoryItem candidate : secInventoryList) {
-                Optional<InventoryItem> lockedCandidate = inventoryItemRepository.findByItemId(candidate.getItemId());
+                Optional<InventoryItem> lockedCandidate = inventoryItemRepository.findWithLockByItemId(candidate.getItemId());
 
                 if (lockedCandidate.isPresent() && lockedCandidate.get().getQuantityAvailable() >= allocationRequestUserDto.getQuantityRequested()) {
                     fulfilledInventory = lockedCandidate.get();
@@ -181,7 +181,7 @@ public class AllocationRecordService {
 
         //restocking the inventory
         //pessimistic lock
-        InventoryItem item = inventoryItemRepository.findByItemId(record.getItem().getItemId())
+        InventoryItem item = inventoryItemRepository.findWithLockByItemId(record.getItem().getItemId())
                 .orElseThrow(() -> new ResourceNotFoundException("Item not found"));
         item.setQuantityAvailable(record.getQuantityRequested() + item.getQuantityAvailable());
         inventoryItemRepository.save(item);

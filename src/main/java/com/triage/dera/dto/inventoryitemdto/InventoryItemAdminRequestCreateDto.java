@@ -1,6 +1,5 @@
 package com.triage.dera.dto.inventoryitemdto;
 
-import com.triage.dera.entity.Warehouse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,10 +9,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @Builder
-public class InventoryItemRequestDto {
+public class InventoryItemAdminRequestCreateDto {
 
-    private Long itemId;
     private String itemName;
-    private Warehouse warehouse;
-    private Integer quantityAvailable;
+    private Long warehouseId;
+    private String addedBy;
+    private Integer lastQuantityAdded;
 }

@@ -7,7 +7,7 @@ import com.triage.dera.entity.Warehouse;
 import com.triage.dera.exceptions.customexceptions.ResourceAlreadyPresentException;
 import com.triage.dera.exceptions.customexceptions.ResourceNotFoundException;
 import com.triage.dera.mappers.WarehouseMappers;
-import com.triage.dera.repository.WareHouseRepository;
+import com.triage.dera.repository.WarehouseRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
@@ -19,7 +19,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class WarehouseService {
-    private final WareHouseRepository wareHouseRepository;
+    private final WarehouseRepository wareHouseRepository;
     private final WarehouseMappers mappers;
 
     @Transactional(readOnly = true)

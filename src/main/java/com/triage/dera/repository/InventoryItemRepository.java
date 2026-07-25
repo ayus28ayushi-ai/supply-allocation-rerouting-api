@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.stereotype.Repository;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,5 +24,10 @@ public interface InventoryItemRepository extends JpaRepository<InventoryItem, Lo
     );
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
+    Optional<InventoryItem> findWithLockByItemId(Long itemId);
+
     Optional<InventoryItem> findByItemId(Long itemId);
+    List<InventoryItem> findByItemNameIgnoreCase(String itemName);
+
+    List<InventoryItem> findByWarehouse_WarehouseId(Long warehouseId);
 }
