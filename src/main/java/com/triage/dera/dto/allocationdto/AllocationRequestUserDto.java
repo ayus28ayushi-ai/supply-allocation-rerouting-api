@@ -22,4 +22,6 @@ public class AllocationRequestUserDto {
     @Min(1)
     private Integer quantityRequested;
 
+
+
 }

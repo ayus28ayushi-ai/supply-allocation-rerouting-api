@@ -13,9 +13,12 @@ import com.triage.dera.repository.InventoryItemRepository;
 import com.triage.dera.repository.WarehouseRepository;
 import com.triage.dera.utility.HaversineMathUtility;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -35,6 +38,8 @@ public class AllocationRecordService {
         InventoryItem fulfilledInventory = null;
         boolean isRerouted = false;
         Double minDistanceKm = null;
+
+        allocationRequestUserDto.setItemName(allocationRequestUserDto.getItemName().trim());
 
         Optional<InventoryItem> primInventory = inventoryItemRepository.findByItemNameAndWarehouseWarehouseId(
                 allocationRequestUserDto.getItemName(), allocationRequestUserDto.getReqWarehouseId());
@@ -208,12 +213,13 @@ public class AllocationRecordService {
     }
 
     @Transactional(readOnly = true)
-    public List<AllocationResponseAdminDto> viewAuditHistory() {
-        List<AllocationRecord> record = allocationRecordRepository.findAll();
-        if(record.isEmpty()){
+    public Page<AllocationResponseAdminDto> viewAuditHistory(Pageable pageable) {
+        Page<AllocationRecord> record = allocationRecordRepository.findAll(pageable);
+
+        if(record.getContent().isEmpty()){
             throw new ResourceNotFoundException("No history found.");
         }
-        return record.stream().map(mapper::mapEntityToAdminDto).toList();
+        return record.map(mapper::mapEntityToAdminDto);
     }
 
     @Transactional(readOnly = true)

@@ -1,14 +1,20 @@
 package com.triage.dera.controller;
 
 import com.triage.dera.dto.allocationdto.*;
-import com.triage.dera.entity.AllocationRecord;
+
 import com.triage.dera.service.AllocationRecordService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.Sort;
+
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 @RestController
@@ -48,9 +54,13 @@ public class AllocationRecordController {
 
     //fetch the whole allocation log for the admin purpose
     @GetMapping
-    public ResponseEntity<List<AllocationResponseAdminDto>> viewAuditHistory(){
+    public ResponseEntity<Page<AllocationResponseAdminDto>> viewAuditHistory(
+            @PageableDefault(
+                    page=0, size=6, sort="allocationId", direction = Sort.Direction.DESC
+            ) Pageable pageable
+    ){
         return ResponseEntity.status(HttpStatus.OK)
-                .body(allocationRecordService.viewAuditHistory());
+                .body(allocationRecordService.viewAuditHistory(pageable));
     }
 
     //cancel allocation and restock the canceled items
