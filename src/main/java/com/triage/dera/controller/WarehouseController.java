@@ -35,7 +35,7 @@ public class WarehouseController {
     }
 
     @PatchMapping("/{wareId}")
-    public ResponseEntity<WarehouseResponseDto> updateWarehouseById(@PathVariable Long wareId, @RequestBody WarehouseUpdateRequestDto warehouseUpdateRequestDto){
+    public ResponseEntity<WarehouseResponseDto> updateWarehouseById(@PathVariable Long wareId, @Valid @RequestBody WarehouseUpdateRequestDto warehouseUpdateRequestDto){
         return ResponseEntity.status(HttpStatus.OK).body(warehouseService.updateWarehouseById(wareId,warehouseUpdateRequestDto));
     }
 
