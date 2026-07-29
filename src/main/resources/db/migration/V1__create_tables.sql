@@ -42,6 +42,7 @@ CREATE TABLE IF NOT EXISTS allocation_records (
                                     CONSTRAINT fk_item_transaction FOREIGN KEY (item_id) REFERENCES inventory_items(id)
 );
 
+-- inventory restock table
 CREATE TABLE IF NOT EXISTS inventory_restock (
     id BIGSERIAL PRIMARY KEY,
     item_id BIGINT,
@@ -52,4 +53,14 @@ CREATE TABLE IF NOT EXISTS inventory_restock (
     added_by VARCHAR(200) NOT NULL,
     added_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_item_history FOREIGN KEY(item_id) REFERENCES inventory_items(id) ON DELETE SET NULL
-)
+);
+
+--user login and register table
+CREATE TABLE IF NOT EXISTS users (
+    id BIGSERIAL PRIMARY KEY,
+    username VARCHAR(200) NOT NULL,
+    email VARCHAR(200) NOT NULL,
+    password VARCHAR(200) NOT NULL,
+    provider VARCHAR(200) NOT NULL,
+    role VARCHAR(200) NOT NULL
+);
