@@ -6,6 +6,7 @@ import com.triage.dera.dto.user.RegisterRequestDto;
 import com.triage.dera.dto.user.UserResponseDto;
 import com.triage.dera.service.AppUserDetailsService;
 import com.triage.dera.service.UserService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.Response;
@@ -39,7 +40,8 @@ public class UserController {
     }
 
     //protected endpoint from where a verified admin can add a new admin
-    @PostMapping("/register-admin")
+    @PostMapping("/admin/register-admin")
+    @SecurityRequirement(name = "Bearer Authentication")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserResponseDto> registerNewAdmin (@Valid @RequestBody RegisterRequestDto registerRequestDto){
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.registerNewAdmin(registerRequestDto));

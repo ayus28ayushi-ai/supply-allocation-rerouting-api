@@ -3,9 +3,11 @@ package com.triage.dera.controller;
 import com.triage.dera.dto.allocationdto.*;
 
 import com.triage.dera.service.AllocationRecordService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Sort;
 
 import org.springframework.data.web.PageableDefault;
@@ -19,14 +21,15 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 @RestController
-@RequestMapping("/dera/allocation")
+@RequestMapping("/dera")
+@SecurityRequirement(name = "Bearer Authentication")
 @RequiredArgsConstructor
 public class AllocationRecordController {
     private final AllocationRecordService allocationRecordService;
 
     //create allocations
-    @PreAuthorize("hasRole('USER')")
-    @PostMapping
+    @PreAuthorize("hasRole('USER', 'ADMIN')")
+    @PostMapping("/user/allocation")
     public ResponseEntity<AllocationResponseUserDto> createAllocation(@Valid @RequestBody AllocationRequestUserDto allocationRequestUserDto){
        return ResponseEntity.status(HttpStatus.CREATED)
                .body(allocationRecordService.createAllocation(allocationRequestUserDto));
@@ -35,7 +38,7 @@ public class AllocationRecordController {
 
     //fetch details by allocation id
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    @GetMapping("/{allocationId}")
+    @GetMapping("/user/allocation/{allocationId}")
     public ResponseEntity<AllocationResponseUserDto> viewAllocationById(@PathVariable Long allocationId){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(allocationRecordService.viewAllocation(allocationId));
@@ -43,7 +46,7 @@ public class AllocationRecordController {
 
     //fetch all allocation records for a warehouse
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    @GetMapping("/war/{warId}")
+    @GetMapping("/user/allocation/war/{warId}")
     public ResponseEntity<List<AllocationResponseAdminDto>> viewAllAllocationForWarehouse(@PathVariable Long warId){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(allocationRecordService.viewAllAllocationForWarehouse(warId));
@@ -51,7 +54,7 @@ public class AllocationRecordController {
 
     //fetch details of an item from the allocation history
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/item/{itemId}")
+    @GetMapping("/admin/allocation/item/{itemId}")
     public ResponseEntity<List<AllocationResponseAdminDto>> viewAllocationByItemId(@PathVariable Long itemId){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(allocationRecordService.viewAllocationByItem(itemId));
@@ -59,19 +62,17 @@ public class AllocationRecordController {
 
     //fetch the whole allocation log for the admin purpose
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping
+    @GetMapping("/admin/allocation")
     public ResponseEntity<Page<AllocationResponseAdminDto>> viewAuditHistory(
-            @PageableDefault(
-                    page=0, size=6, sort="allocationId", direction = Sort.Direction.ASC
-            ) Pageable pageable
+             @ParameterObject Pageable pageable
     ){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(allocationRecordService.viewAuditHistory(pageable));
     }
 
     //cancel allocation and restock the canceled items
-    @PreAuthorize("hasRole('USER')")
-    @PatchMapping("/{allocationId}/cancel")
+    @PreAuthorize("hasRole('USER', 'ADMIN')")
+    @PatchMapping("/user/allocation/{allocationId}/cancel")
     public ResponseEntity<AllocationCancelResponseDto> cancelAllocation(@PathVariable Long allocationId, @Valid @RequestBody AllocationCancelRequestDto request){
         return ResponseEntity.ok(allocationRecordService.cancelAllocation(allocationId, request));
     }

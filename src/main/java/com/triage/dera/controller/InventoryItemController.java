@@ -2,6 +2,7 @@ package com.triage.dera.controller;
 
 import com.triage.dera.dto.inventoryitemdto.*;
 import com.triage.dera.service.InventoryItemService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +19,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/dera/stock")
+@RequestMapping("/dera")
+@SecurityRequirement(name = "Bearer Authentication")
 @RequiredArgsConstructor
 public class InventoryItemController {
 
@@ -26,7 +28,7 @@ public class InventoryItemController {
 
     //ENDPOINTS FOR THE USER
     //get all inventory item details
-    @GetMapping
+    @GetMapping("/user/inventory")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<List<InventoryItemResponseDto>> getAllInventoryForUser() {
         return ResponseEntity.ok(inventoryItemService.getAllInventoryForUser());
@@ -34,13 +36,13 @@ public class InventoryItemController {
 
     //get all inventory item details by warehouse id
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    @GetMapping("warehouse/{warehouseId}")
+    @GetMapping("/user/warehouse/{warehouseId}")
     public ResponseEntity<List<InventoryItemResponseDto>> getInventoryByWarehouseForUser(@PathVariable Long warehouseId) {
         return ResponseEntity.ok(inventoryItemService.getInventoryByWarehouseForUser(warehouseId));
     }
 
     //get all inventory item details by item id
-    @GetMapping("/item/{itemId}")
+    @GetMapping("/user/item/{itemId}")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<List<InventoryItemResponseDto>> getWarehousesByItemIdForUser(@PathVariable Long itemId) {
         return ResponseEntity.ok(inventoryItemService.getWarehousesByItemIdForUser(itemId));
@@ -48,7 +50,7 @@ public class InventoryItemController {
 
     //ENDPOINTS FOR THE ADMIN
     //get the latest log of  inventory item (audit history)
-    @GetMapping("/admin")
+    @GetMapping("/admin/inventory")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<InventoryItemResponseAdminDto>> getAllInventoryForAdmin(
             @PageableDefault(
@@ -73,7 +75,7 @@ public class InventoryItemController {
     }
 
     //create new items
-    @PostMapping("/admin")
+    @PostMapping("/admin/stock")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<InventoryItemResponseAdminDto> createNewStock(@Valid @RequestBody InventoryItemAdminRequestCreateDto requestDto) {
         InventoryItemResponseAdminDto response = inventoryItemService.createNewStock(requestDto);
@@ -81,14 +83,14 @@ public class InventoryItemController {
     }
 
     //update items
-    @PatchMapping("/admin/{itemId}")
+    @PatchMapping("/admin/item/{itemId}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<InventoryItemResponseAdminDto> updateStock(@PathVariable Long itemId, @Valid @RequestBody InventoryItemAdminRequestUpdateDto requestDto) {
         return ResponseEntity.ok(inventoryItemService.updateStock(itemId, requestDto));
     }
 
     //search by name
-    @GetMapping("/item/search")
+    @GetMapping("/admin/item/search")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<InventoryItemResponseDto>> searchItemsByName(
             @RequestParam String name) {

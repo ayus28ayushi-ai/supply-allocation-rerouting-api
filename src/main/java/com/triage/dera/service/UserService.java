@@ -4,6 +4,7 @@ import com.triage.dera.dto.user.AuthResponseDto;
 import com.triage.dera.dto.user.LoginRequestDto;
 import com.triage.dera.dto.user.RegisterRequestDto;
 import com.triage.dera.dto.user.UserResponseDto;
+import com.triage.dera.entity.AuthProvider;
 import com.triage.dera.entity.Role;
 import com.triage.dera.entity.UserPrincipal;
 import com.triage.dera.entity.Users;
@@ -64,4 +65,35 @@ public class UserService {
         Users savedAdmin = userRepo.save(newAdmin);
         return mappers.mapEntityToUserResponseDto(savedAdmin);
     }
+
+    //find an existing user or create a new one when log in using GOOGLE or GITHUB
+    public UserPrincipal processOAuthUser(String email, String username, AuthProvider provider) {
+        Users user = userRepo.findByEmail(email).orElseGet(() -> {
+            Users newUser = new Users();
+            newUser.setEmail(email);
+            newUser.setUsername(username);
+            newUser.setProvider(provider);
+            newUser.setPassword(null);
+            newUser.setRole(Role.ROLE_USER);
+            return userRepo.save(newUser);
+        });
+
+        return new UserPrincipal(user);
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
