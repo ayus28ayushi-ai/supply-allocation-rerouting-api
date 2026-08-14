@@ -17,6 +17,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.HashSet;
 
 @Service
 @RequiredArgsConstructor
@@ -67,6 +70,7 @@ public class UserService {
     }
 
     //find an existing user or create a new one when log in using GOOGLE or GITHUB
+    @Transactional
     public UserPrincipal processOAuthUser(String email, String username, AuthProvider provider) {
         Users user = userRepo.findByEmail(email).orElseGet(() -> {
             Users newUser = new Users();
