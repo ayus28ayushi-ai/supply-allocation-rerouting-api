@@ -52,7 +52,8 @@ public class UserConfig {
                                 "/swagger-ui.html",
                                 "/oauth2/**",
                                 "/login/oauth2/**,",
-                                "/login.html").permitAll()
+                                "/login.html",
+                                "/*.jpg").permitAll()
                         .requestMatchers("/dera/admin/**").hasRole("ADMIN")
                         .requestMatchers("/dera/user/**").hasAnyRole("ADMIN", "USER")
                         .anyRequest().authenticated())
