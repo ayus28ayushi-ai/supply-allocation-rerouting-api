@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS inventory_items(
 );
 
 -- index for fast lookup inside specific warehouse
-CREATE INDEX idx_warehouse_item ON inventory_items(item_name, warehouse_id);
+CREATE INDEX IF NOT EXISTS idx_warehouse_item ON inventory_items(item_name, warehouse_id);
 
 -- records for the allocated items
 CREATE TABLE IF NOT EXISTS allocation_records (
@@ -42,6 +42,8 @@ CREATE TABLE IF NOT EXISTS allocation_records (
                                     CONSTRAINT fk_item_transaction FOREIGN KEY (item_id) REFERENCES inventory_items(id)
 );
 
+CREATE INDEX IF NOT EXISTS idx_allocation_timestamp ON allocation_records(timestamp DESC);
+
 -- inventory restock table
 CREATE TABLE IF NOT EXISTS inventory_restock (
     id BIGSERIAL PRIMARY KEY,
@@ -55,12 +57,13 @@ CREATE TABLE IF NOT EXISTS inventory_restock (
     CONSTRAINT fk_item_history FOREIGN KEY(item_id) REFERENCES inventory_items(id) ON DELETE SET NULL
 );
 
+
 --user login and register table
 CREATE TABLE IF NOT EXISTS users (
     id BIGSERIAL PRIMARY KEY,
-    username VARCHAR(200) NOT NULL,
-    email VARCHAR(200) NOT NULL,
+    username VARCHAR(200) NOT NULL UNIQUE,
+    email VARCHAR(200) NOT NULL UNIQUE,
     password VARCHAR(200) NOT NULL,
-    provider VARCHAR(200) NOT NULL,
+    provider VARCHAR(200) NOT NULL DEFAULT 'LOCAL',
     role VARCHAR(200) NOT NULL
 );
