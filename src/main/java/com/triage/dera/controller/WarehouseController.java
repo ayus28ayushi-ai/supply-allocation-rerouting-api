@@ -29,18 +29,21 @@ public class WarehouseController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/admin/warehouse")
+    @SecurityRequirement(name = "Bearer Authentication")
     public ResponseEntity<WarehouseResponseDto> createWarehouse(@Valid @RequestBody WarehouseCreateRequestDto warehouseCreateRequestDto){
         return ResponseEntity.status(HttpStatus.CREATED).body(warehouseService.createWarehouse(warehouseCreateRequestDto));
     }
 
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @GetMapping("/user/warehouse/{wareId}")
+    @SecurityRequirement(name = "Bearer Authentication")
     public ResponseEntity<WarehouseResponseDto> viewWarehouseById(@PathVariable Long wareId){
         return ResponseEntity.status(HttpStatus.OK).body(warehouseService.viewWarehouseById(wareId));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/admin/warehouse/{wareId}")
+    @SecurityRequirement(name = "Bearer Authentication")
     public ResponseEntity<WarehouseResponseDto> updateWarehouseById(@PathVariable Long wareId, @Valid @RequestBody WarehouseUpdateRequestDto warehouseUpdateRequestDto){
         return ResponseEntity.status(HttpStatus.OK).body(warehouseService.updateWarehouseById(wareId,warehouseUpdateRequestDto));
     }
