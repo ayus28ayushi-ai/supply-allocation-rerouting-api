@@ -48,11 +48,13 @@ public class UserConfig {
                         .requestMatchers("/dera/register",
                                 "/dera/login",
                                 "/v3/api-docs/**",
+                                "/v3/api-docs",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/oauth2/**",
-                                "/login/**,",
+                                "/login/**",
                                 "/login.html",
+                                "/webjars/**",
                                 "/*.jpg").permitAll()
                         .requestMatchers("/dera/admin/**").hasRole("ADMIN")
                         .requestMatchers("/dera/user/**").hasAnyRole("ADMIN", "USER")
