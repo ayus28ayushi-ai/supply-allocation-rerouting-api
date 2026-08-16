@@ -30,8 +30,7 @@ DERA is a warehouse inventory management and order allocation system built with 
 
 ## Live Demo & Documentation
 
-* **Live Deployment:** `[YOUR_LIVE_DEPLOYMENT_URL_HERE]` *(Deployment Pending)*
-* **Interactive Swagger UI:** `[YOUR_LIVE_DEPLOYMENT_URL_HERE]/swagger-ui/index.html`  
+* **Live Deployment:** [https://dera-qw60.onrender.com/login.html](https://dera-qw60.onrender.com)
 * **Demo Video:** `[YOUR_DEMO_VIDEO_LINK_HERE]`
 
 ---
@@ -377,8 +376,8 @@ CREATE DATABASE triage_dera_db;
 
 Once the application has started, access the following URLs in your browser:
 
-* **Auth Portal:** http://localhost:8080/login.html
+* **Auth Portal:** [http://localhost:8080/login.html](http://localhost:8080/login.html)
 ---
 ## Author
   ***Name*** : Ayushi Singh  
-  ***GitHub Profile*** : https://github.com/ayus28ayushi-ai
+  ***GitHub Profile*** : [https://github.com/ayus28ayushi-ai](https://github.com/ayus28ayushi-ai)
