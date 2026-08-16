@@ -60,6 +60,14 @@ DERA is a warehouse inventory management and order allocation system built with 
 * **Automated Data Seeding:** Startup initialization via `CommandLineRunner` to seed a default Super Admin account if none exists.
 ---
 
+## Deployment & CI/CD
+
+* **Automated Pipeline:** Integrated GitHub with **Render** for automated Continuous Integration and Continuous Deployment (CI/CD). Every push to the `main` branch automatically triggers a fresh build and production deployment.
+* **Database Hosting:** Provisioned a cloud-native **Neon PostgreSQL** serverless instance configured with SSL and environment-based secret management.
+* **API Documentation:** Interactive **Swagger UI** generated automatically via `springdoc-openapi` for live testing.
+
+---
+
 ## System Architecture Diagrams
 ### End-to-End Application & Dynamic Rerouting Flow
 ```mermaid
