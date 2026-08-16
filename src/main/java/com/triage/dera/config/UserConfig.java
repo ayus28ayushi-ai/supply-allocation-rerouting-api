@@ -5,6 +5,7 @@ import com.triage.dera.exceptions.CustomAuthenticationEntryPoint;
 import com.triage.dera.oauth.OAuth2Handler;
 import com.triage.dera.service.AppUserDetailsService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -28,6 +29,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @EnableMethodSecurity
 @RequiredArgsConstructor
+@Slf4j
 public class UserConfig {
 
    private final JwtFilter jwtFilter;
@@ -61,7 +63,11 @@ public class UserConfig {
                         .anyRequest().authenticated())
                 .oauth2Login(oauth2 -> oauth2
                         .loginPage("/login.html")
-                        .successHandler(OAuth2Handler))
+                        .successHandler(OAuth2Handler)
+                        .failureHandler((request, response, exception) -> {
+                            log.error("OAuth2 Login Failed: ", exception);
+                            response.sendRedirect("/login.html?error=" + exception.getLocalizedMessage());
+                        }))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class )
                 .build();
