@@ -18,6 +18,7 @@ DERA is a warehouse inventory management and order allocation system built with 
 - [Live Demo & Documentation](#live-demo--documentation)
 - [ Key Architectural Highlights](#key-architectural-highlights)
 - [ System Architecture Diagrams](#system-architecture-diagrams)
+- [ Entity Relationship Diagram](#entity-relationship-diagram)
 - [ API Endpoint Reference](#api-endpoint-reference)
 - [ Seed Admin Credentials](#seed-admin-credentials)
 - [Sample Test Payloads](#sample-test-payloads)
@@ -219,7 +220,71 @@ flowchart LR
     style AdminCtrl fill:#581c87,color:#fff,stroke:#9333ea
     style UserCtrl fill:#047857,color:#fff,stroke:#10b981
 ```
+---
 
+## Entity Relationship Diagram
+```mermaid
+ 
+erDiagram
+    warehouses ||--|{ inventory_items : "stores"
+    inventory_items ||--o{ allocation_records : "tracks"
+    inventory_items ||--o{ inventory_restock : "records"
+
+    warehouses {
+        bigint id PK
+        varchar name
+        double_precision latitude
+        double_precision longitude
+        boolean is_active
+        bigint version
+    }
+
+    inventory_items {
+        bigint id PK
+        bigint warehouse_id FK
+        varchar item_name
+        int quantity_available
+        bigint version
+    }
+
+    allocation_records {
+        bigint id PK
+        bigint item_id FK
+        varchar item_name
+        varchar requester_name
+        int quantity_claimed
+        bigint requested_war_id
+        varchar requested_war_name
+        bigint fulfilled_war_id
+        varchar fulfilled_war_name
+        boolean is_rerouted
+        double_precision distance_km
+        timestamp timestamp
+        boolean is_active
+        varchar cancelled_by
+        bigint version
+    }
+
+    inventory_restock {
+        bigint id PK
+        bigint item_id FK
+        varchar item_name
+        bigint warehouse_id
+        varchar warehouse_name
+        int last_quantity_added
+        varchar added_by
+        timestamp added_at
+    }
+
+    users {
+        bigint id PK
+        varchar username UK
+        varchar email UK
+        varchar password
+        varchar provider
+        varchar role
+    }
+```
 ---
 
 ## API Endpoint Reference
