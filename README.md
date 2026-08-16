@@ -380,6 +380,11 @@ Use the sample JSON bodies in the PDF to quickly test endpoints in Swagger UI or
 <a href="src/main/resources/static/DeraAPI_sample_payload.pdf" target="_blank">Click to Open PDF</a>
 
 ---
+## Security & Architecture Trade-offs
+
+**Token Transport (Demo vs. Production):**  
+  For demo simplicity and seamless integration with Swagger UI, JWT tokens are currently passed via URL query parameters. In a production deployment, this would be replaced with `HttpOnly`, `Secure`, and `SameSite` cookies or a single-use authorization code exchange to eliminate token exposure in server logs and browser history.
+---
 ## Local Setup & Installation
 
 Follow these steps to configure, build, and run the project on your local machine.
