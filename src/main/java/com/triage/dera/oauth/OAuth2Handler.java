@@ -7,6 +7,7 @@ import com.triage.dera.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jspecify.annotations.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
@@ -17,6 +18,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 
+@Slf4j
 @Component
 public class OAuth2Handler extends SimpleUrlAuthenticationSuccessHandler {
 
@@ -34,41 +36,52 @@ public class OAuth2Handler extends SimpleUrlAuthenticationSuccessHandler {
     @Override
     public void onAuthenticationSuccess(@NonNull HttpServletRequest request,
                                         @NonNull HttpServletResponse response,
-                                        Authentication authentication) throws IOException {
+                                        @NonNull Authentication authentication) throws IOException {
 
-        OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+        try {
+            OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
 
-        //1. get the provider name
-        AuthProvider provider = AuthProvider.GOOGLE;
-        if (authentication instanceof OAuth2AuthenticationToken oauthToken) {
-            String registrationId = oauthToken.getAuthorizedClientRegistrationId().toUpperCase();
-            provider = AuthProvider.valueOf(registrationId);
+            // 1. Get the provider safely
+            AuthProvider provider = AuthProvider.GOOGLE;
+            if (authentication instanceof OAuth2AuthenticationToken oauthToken) {
+                String registrationId = oauthToken.getAuthorizedClientRegistrationId().toUpperCase();
+                try {
+                    provider = AuthProvider.valueOf(registrationId);
+                } catch (IllegalArgumentException e) {
+                    log.warn("Unknown provider {}, defaulting to GOOGLE", registrationId);
+                }
+            }
+
+            // 2. Extract email
+            String email = oAuth2User.getAttribute("email");
+            if (email == null) {
+                String login = oAuth2User.getAttribute("login");
+                email = (login != null) ? login + "@github.user" : "unknown@social.user";
+            }
+
+            // 3. Extract name
+            String name = oAuth2User.getAttribute("name");
+            if (name == null) {
+                name = oAuth2User.getAttribute("login");
+            }
+
+            // 4. Search or create user in PostgreSQL
+            UserPrincipal principal = userService.processOAuthUser(email, name, provider);
+
+            // 5. Generate standard JWT
+            String token = jwtService.generateToken(principal);
+
+            // 6. Redirect to Swagger UI with token parameter
+            String targetUrl = UriComponentsBuilder.fromUriString("/swagger-ui/index.html")
+                    .queryParam("token", token)
+                    .build().toUriString();
+
+            getRedirectStrategy().sendRedirect(request, response, targetUrl);
+
+        } catch (Exception ex) {
+            log.error("Error processing OAuth2 success login: ", ex);
+            // On error, redirect back to login page with error param instead of crashing
+            getRedirectStrategy().sendRedirect(request, response, "/login.html?error=oauth_processing_failed");
         }
-
-        //2. extract the email from
-        String email = oAuth2User.getAttribute("email");
-        if (email == null) {
-            String login = oAuth2User.getAttribute("login");
-            email = (login != null) ? login + "@github.user" : "unknown@social.user";
-        }
-
-        // 3. extract the username from
-        String name = oAuth2User.getAttribute("name");
-        if (name == null) {
-            name = oAuth2User.getAttribute("login"); // Fallback to handle
-        }
-
-        // 4. searching or creating user
-        UserPrincipal principal = userService.processOAuthUser(email, name, provider);
-
-        // 5. Generate standard JWT using YOUR existing JwtService!
-        String token = jwtService.generateToken(principal);
-
-        // 6. Redirect to Swagger UI (or Frontend) with JWT in query parameter
-        String targetUrl = UriComponentsBuilder.fromUriString("/swagger-ui/index.html")
-                .queryParam("token", token)
-                .build().toUriString();
-
-        getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }
 }

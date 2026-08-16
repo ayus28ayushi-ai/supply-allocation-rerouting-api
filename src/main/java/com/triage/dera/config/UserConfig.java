@@ -61,7 +61,7 @@ public class UserConfig {
                         .anyRequest().authenticated())
                 .oauth2Login(oauth2 -> oauth2
                         .loginPage("/login.html")
-                        .defaultSuccessUrl("/swagger-ui/index.html", true))
+                        .successHandler(OAuth2Handler))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class )
                 .build();
