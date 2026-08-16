@@ -249,10 +249,10 @@ flowchart LR
 ### Order Allocation & Rerouting (`allocation-record-controller`)
 | Method | Endpoint | Access | Description |
 | :--- | :--- | :--- | :--- |
-| `POST` | `/dera/user/allocation` | User | Request stock allocation (Triggers Haversine reroute if out of stock) |
-| `PATCH` | `/dera/user/allocation/{allocationId}/cancel` | User | Cancel an allocation record & trigger pessimistic restock |
-| `GET` | `/dera/user/allocation/{allocationId}` | User | Get allocation details by ID |
-| `GET` | `/dera/user/allocation/war/{warId}` | User | View allocations for a specific warehouse |
+| `POST` | `/dera/user/allocation` | User/Admin | Request stock allocation (Triggers Haversine reroute if out of stock) |
+| `PATCH` | `/dera/user/allocation/{allocationId}/cancel` | User/Admin | Cancel an allocation record & trigger pessimistic restock |
+| `GET` | `/dera/user/allocation/{allocationId}` | User/Admin | Get allocation details by ID |
+| `GET` | `/dera/user/allocation/war/{warId}` | User/Admin | View allocations for a specific warehouse |
 | `GET` | `/dera/admin/allocation` | Admin | Get paginated list of all allocations |
 | `GET` | `/dera/admin/allocation/item/{itemId}` | Admin | View allocation history for a specific item |
 
