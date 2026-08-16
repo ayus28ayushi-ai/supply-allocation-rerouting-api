@@ -7,7 +7,9 @@
 ![JWT](https://img.shields.io/badge/JWT-Stateless-000000?style=flat-square&logo=jsonwebtokens&logoColor=white)
 ![OAuth2](https://img.shields.io/badge/OAuth2-Google%20%26%20GitHub-4285F4?style=flat-square&logo=google&logoColor=white)
 ![Swagger UI](https://img.shields.io/badge/Swagger-OpenAPI%203.0-85EA2D?style=flat-square&logo=swagger&logoColor=black)
-
+![Neon](https://img.shields.io/badge/Neon_Postgres-00E599?style=for-the-badge&logo=neon&logoColor=black)
+![Render](https://img.shields.io/badge/Render-46E3B7?style=for-the-badge&logo=render&logoColor=white)
+       
 # DERA (Dynamic Emergency Rerouting & Allocation System)
 
 DERA is a warehouse inventory management and order allocation system built with Spring Boot 3 and Java 21. It features intelligent dynamic rerouting using the **Haversine formula**, robust hybrid database concurrency control, stateless JWT authentication, and OAuth2 social logins.
@@ -17,12 +19,14 @@ DERA is a warehouse inventory management and order allocation system built with 
 
 - [Live Demo & Documentation](#live-demo--documentation)
 - [ Key Architectural Highlights](#key-architectural-highlights)
+- [ Deployment and CI/CD](#deployment--cicd)
 - [ System Architecture Diagrams](#system-architecture-diagrams)
 - [ Entity Relationship Diagram](#entity-relationship-diagram)
 - [ API Endpoint Reference](#api-endpoint-reference)
 - [ Seed Admin Credentials](#seed-admin-credentials)
-- [Sample Test Payloads](#sample-test-payloads)
 - [ Step-by-Step Testing Guide](#step-by-step-testing-guide)
+- [Sample Test Payloads](#sample-test-payloads)
+- [Security & Architecture Trade-offs](#security--architecture-trade-offs)
 - [ Local Setup & Installation](#local-setup--installation)
 
 </details>
