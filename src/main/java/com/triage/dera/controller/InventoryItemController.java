@@ -36,7 +36,7 @@ public class InventoryItemController {
 
     //get all inventory item details by warehouse id
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    @GetMapping("/user/warehouse/{warehouseId}")
+    @GetMapping("/user/ware/{warehouseId}")
     public ResponseEntity<List<InventoryItemResponseDto>> getInventoryByWarehouseForUser(@PathVariable Long warehouseId) {
         return ResponseEntity.ok(inventoryItemService.getInventoryByWarehouseForUser(warehouseId));
     }
