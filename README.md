@@ -30,7 +30,7 @@ DERA is a warehouse inventory management and order allocation system built with 
 
 ## Live Demo & Documentation
 
-* **Live Deployment:** [https://dera-qw60.onrender.com/login.html](https://dera-qw60.onrender.com)
+* **Live Deployment:** [https://dera-qw60.onrender.com/login.html](https://dera-qw60.onrender.com/login.html)
 * **Demo Video:** `[YOUR_DEMO_VIDEO_LINK_HERE]`
 
 ---
