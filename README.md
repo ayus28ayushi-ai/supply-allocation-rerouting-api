@@ -233,17 +233,17 @@ flowchart LR
 | `POST` | `/dera/admin/register-admin` | Admin | Onboard a new administrator account |
 
 ### Inventory Management (`inventory-item-controller`)
-| Method | Endpoint | Access | Description |
-| :--- | :--- | :--- | :--- |
-| `POST` | `/dera/admin/stock` | Admin | Add or restock inventory items |
-| `PUT` | `/dera/admin/item/{itemId}/details` | Admin | Update item metadata |
-| `PATCH` | `/dera/admin/item/{itemId}` | Admin | Partial updates to inventory item |
-| `GET` | `/dera/admin/inventory` | Admin | View all inventory stock levels |
-| `GET` | `/dera/admin/item/search` | Admin | Search inventory items with criteria |
-| `GET` | `/dera/admin/item/{itemId}` | Admin | Fetch single item details by ID |
-| `GET` | `/dera/user/inventory` | User/Admin | Browse public inventory list |
-| `GET` | `/dera/user/item/{itemId}` | User/Admin | View item details |
-| `GET` | `/dera/user/warehouse/{warehouseId}` | User/Admin | List inventory by specific warehouse |
+| Method | Endpoint                              | Access | Description |
+| :--- |:--------------------------------------| :--- | :--- |
+| `POST` | `/dera/admin/stock`                   | Admin | Add or restock inventory items |
+| `PUT` | `/dera/admin/item/{itemId}/details`   | Admin | Update item metadata |
+| `PATCH` | `/dera/admin/item/{itemId}`           | Admin | Partial updates to inventory item |
+| `GET` | `/dera/admin/inventory`               | Admin | View all inventory stock levels |
+| `GET` | `/dera/admin/item/search`             | Admin | Search inventory items with criteria |
+| `GET` | `/dera/admin/item/{itemId}`           | Admin | Fetch single item details by ID |
+| `GET` | `/dera/user/inventory`                | User/Admin | Browse public inventory list |
+| `GET` | `/dera/user/item/{itemId}`            | User/Admin | View item details |
+| `GET` | `/dera/user/ware/{warehouseId}`       | User/Admin | List inventory by specific warehouse |
 | `GET` | `/dera/admin/warehouse/{warehouseId}` | Admin | Administrative warehouse inventory lookup |
 
 ### Order Allocation & Rerouting (`allocation-record-controller`)
