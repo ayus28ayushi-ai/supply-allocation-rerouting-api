@@ -396,6 +396,7 @@ Use the sample JSON bodies in the PDF to quickly test endpoints in Swagger UI or
 
 **Token Transport (Demo vs. Production):**  
   For demo simplicity and seamless integration with Swagger UI, JWT tokens are currently passed via URL query parameters. In a production deployment, this would be replaced with `HttpOnly`, `Secure`, and `SameSite` cookies or a single-use authorization code exchange to eliminate token exposure in server logs and browser history.
+  
 ---
 ## Local Setup & Installation
 
