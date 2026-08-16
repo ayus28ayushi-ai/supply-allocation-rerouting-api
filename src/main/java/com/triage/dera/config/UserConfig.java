@@ -51,13 +51,13 @@ public class UserConfig {
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/oauth2/**",
-                                "/login/oauth2/**,",
+                                "/login/**,",
                                 "/login.html",
                                 "/*.jpg").permitAll()
                         .requestMatchers("/dera/admin/**").hasRole("ADMIN")
                         .requestMatchers("/dera/user/**").hasAnyRole("ADMIN", "USER")
                         .anyRequest().authenticated())
-                .oauth2Login(oauth2 -> oauth2.successHandler(OAuth2Handler))
+                .oauth2Login(oauth2 -> oauth2.defaultSuccessUrl("/swagger-ui/index.html", true))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class )
                 .build();
